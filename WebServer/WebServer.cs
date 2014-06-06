@@ -61,7 +61,7 @@ namespace WebServer
             _webRoot = root;
 
 
-            /* create a TcpListener to listen for netweork requests on the provided
+            /* create a TcpListener to listen for network requests on the provided
              * port number at the lookedup host address and start listening */
             TcpListener listener = new TcpListener(
                 Dns.GetHostAddresses("localhost")[0], port);
@@ -288,10 +288,10 @@ namespace WebServer
          * body of the response */
         private void _GenerateScriptResult(Socket socket, string path, Dictionary<string, string> requestParameters)
         {
-            /* get a script result from the scrupt processor using the request parameter dictionary */
+            /* get a script result from the script processor using the request parameter dictionary */
             ScriptResult result = _scriptProcessor.ProcessScript(path, requestParameters);
 
-            /* if the result was an error, send an HTTP Error (500) along wiht a summary of 
+            /* if the result was an error, send an HTTP Error (500) along with a summary of 
              * what went wrong as the body */
             if (result.Error)
             {
