@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WebServer
 {
-    public class ScriptResult
+    public class WebResult
     {
         public bool Error { get; set; }
         public string Result { get; set; }

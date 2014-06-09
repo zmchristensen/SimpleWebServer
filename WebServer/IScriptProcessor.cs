@@ -14,6 +14,6 @@ namespace WebServer
      */
     interface IScriptProcessor
     {
-        ScriptResult ProcessScript(string path, IDictionary<string, string> requestParameters);
+        WebResult ProcessScript(string path, IDictionary<string, string> requestParameters);
     }
 }

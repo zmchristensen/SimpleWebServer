@@ -30,6 +30,7 @@ namespace WebServer
     {
         private readonly string _webRoot;
         private IScriptProcessor _scriptProcessor;
+        private IScriptProcessor _webScriptProcessor;
 
         static void Main(string[] args)
         {
@@ -53,6 +54,7 @@ namespace WebServer
             /* this script processor instance will be used to process files of type 
              * csscript */
             _scriptProcessor = new CscriptProcessor();
+            _webScriptProcessor = new CWebTemplateProcessor();
 
             /*TODO: add another instance of a IScriptProcessor to handle files of
              * type csweb */
@@ -211,6 +213,11 @@ namespace WebServer
                 /* TODO: add another handler for processing web template files
                  * case ".csweb": 
                  */
+                case ".csweb":
+                    {
+                        _GenerateCsWebResult(socket, path, requestParameters);
+                        return;
+                    }
                 default:
                     type = "application/octet-stream";
                     break;
@@ -289,7 +296,7 @@ namespace WebServer
         private void _GenerateScriptResult(Socket socket, string path, Dictionary<string, string> requestParameters)
         {
             /* get a script result from the script processor using the request parameter dictionary */
-            ScriptResult result = _scriptProcessor.ProcessScript(path, requestParameters);
+            WebResult result = _scriptProcessor.ProcessScript(path, requestParameters);
 
             /* if the result was an error, send an HTTP Error (500) along with a summary of 
              * what went wrong as the body */
@@ -302,6 +309,13 @@ namespace WebServer
                 /* send a response with the results of the script evaluation */
                 _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", ResponseType.OK);
             }
+        }
+
+        public void _GenerateCsWebResult(Socket socket, string path, Dictionary<string, string> requestParameters)
+        {
+            WebResult result = _webScriptProcessor.ProcessScript(path, requestParameters);
+
+            _SendResponse(socket, Encoding.ASCII.GetBytes(result.Result), "text/html; charset=utf8", result.Error ? ResponseType.ERROR : ResponseType.OK);
         }
     }
 }
