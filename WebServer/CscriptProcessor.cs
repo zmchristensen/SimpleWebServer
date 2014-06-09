@@ -48,7 +48,9 @@ namespace WebServer
             _parameters.CompilerOptions = "/t:library";
         }
 
-        public ScriptResult ProcessScript(string path, IDictionary<string, string> requestParameters)
+
+
+        public WebResult ProcessScript(string path, IDictionary<string, string> requestParameters)
         {
             StringBuilder scriptBody = new StringBuilder();
          
@@ -65,10 +67,15 @@ namespace WebServer
                 }
             }
 
+            return ProcessScriptString(scriptBody.ToString(), requestParameters);
+        }
+
+        public WebResult ProcessScriptString(string script, IDictionary<string, string> requestParameters)
+        {
             /* combine the script string with the class template in order to create something 
              * that can be compiled. NOTE that the class template provides the wout and 
              * request variables */
-            string source = _classTemplate.Replace("{0}", scriptBody.ToString());
+            string source = _classTemplate.Replace("{0}", script);
 
             /* compile the generated source */
             CompilerResults result = _compiler.CompileAssemblyFromSource(_parameters, source);
@@ -91,13 +98,13 @@ namespace WebServer
                 errorBody.Append("</body></html>");
 
                 /* the script result with the list of errors as the result */
-                return new ScriptResult()
+                return new WebResult()
                 {
                     Error = true,
                     Result = errorBody.ToString()
                 };
             }
-            
+
             /* if the class compiled, use reflection to get the assembly and 
              * instantiate the class */
             System.Reflection.Assembly codeAssembly = result.CompiledAssembly;
@@ -123,20 +130,20 @@ namespace WebServer
                 /* return a script result with the contents of the string writer which 
                  * should be the HTML (or whatever) that was produced by the script
                  * and written to wout */
-                return new ScriptResult() 
-                { 
-                    Error = false, 
-                    Result = s.ToString() 
+                return new WebResult()
+                {
+                    Error = false,
+                    Result = s.ToString()
                 };
             }
             catch (Exception e)
             {
                 /* if the method cannot be invoked (i.e. runtime error) send back 
                  * a failed result with the runtime error */
-                return new ScriptResult()
+                return new WebResult()
                 {
                     Error = true,
-                    Result = string.Format("<html><body><h1>Runtime Error</h1><p>The following runtime error occurred: {0}</p>", 
+                    Result = string.Format("<html><body><h1>Runtime Error</h1><p>The following runtime error occurred: {0}</p>",
                         e.InnerException.Message)
                 };
             }
